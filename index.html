@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz: Diagnóstico da Harmonia Conjugal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-bg': '#FFF0F5', // Lavender Blush - page background
+            'brand-card-bg': '#9F335A', // Dark Rose - card backgrounds
+            'brand-card-text': '#FDF8FA', // Off-white for main text on dark cards
+            'brand-card-text-muted': '#EAD9E0', // Muted light pink for secondary text
+            'brand-text': '#4C2A3A', // Dark reddish-purple for text on light backgrounds
+            'brand-accent': '#E0A800', // A rich, warm gold for high-contrast highlights & buttons
+            'brand-accent-dark': '#C79500', // Darker gold for hover
+            'brand-white': '#FFFFFF',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/"
+  }
+}
+</script>
+</head>
+<body class="bg-brand-bg text-brand-text font-sans">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { QuizState, EventType } from './types';
+import { quizQuestions } from './constants/quizData';
+import WelcomeScreen from './components/WelcomeScreen';
+import QuizScreen from './components/QuizScreen';
+import ResultScreen from './components/ResultScreen';
+import LeadCaptureScreen from './components/LeadCaptureScreen';
+import DashboardScreen from './components/DashboardScreen';
+import AuthScreen from './components/AuthScreen';
+import * as api from './api';
+
+const App: React.FC = () => {
+  const [view, setView] = useState<QuizState>(QuizState.WELCOME);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [diagnosisLevel, setDiagnosisLevel] = useState<number>(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // This effect handles routing
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#dashboard') {
+        if (sessionStorage.getItem('dashboard_authed') === 'true') {
+          setIsAuthenticated(true);
+          setView(QuizState.DASHBOARD);
+        } else {
+          setView(QuizState.AUTH);
+        }
+      } else {
+        if (view === QuizState.DASHBOARD || view === QuizState.AUTH) {
+            setView(QuizState.WELCOME);
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange, false);
+    handleHashChange(); // Check hash on initial load
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    };
+  }, [view]);
+
+
+  const trackEvent = useCallback((eventType: EventType, payload?: any) => {
+    api.trackEvent(eventType, payload);
+  }, []);
+
+  const handleAnswer = useCallback(() => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+    } else {
+      setView(QuizState.LEAD_CAPTURE);
+    }
+  }, [currentQuestionIndex]);
+
+  const handleLeadSubmit = useCallback((leadData: { name: string; email: string; phone: string }) => {
+    console.log("Lead captured:", leadData);
+    trackEvent(EventType.LEAD_SUBMIT);
+    setIsAnalyzing(true);
+    setDiagnosisLevel(Math.floor(Math.random() * 3));
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setView(QuizState.RESULTS);
+    }, 2500);
+  }, [trackEvent]);
+
+  const handleAuthSuccess = () => {
+    sessionStorage.setItem('dashboard_authed', 'true');
+    setIsAuthenticated(true);
+    setView(QuizState.DASHBOARD);
+  };
+  
+  const renderContent = () => {
+    if (isAnalyzing) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-brand-bg p-4 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-brand-accent mb-6"></div>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-text">Analisando suas respostas...</h2>
+          <p className="text-lg text-gray-500 mt-2">Gerando seu diagnóstico personalizado.</p>
+        </div>
+      );
+    }
+
+    switch (view) {
+      case QuizState.WELCOME:
+        return <WelcomeScreen onStart={() => {
+            trackEvent(EventType.QUIZ_START);
+            setView(QuizState.QUIZ);
+        }} trackVisit={() => trackEvent(EventType.VISIT)} />;
+      case QuizState.QUIZ:
+        return (
+          <QuizScreen
+            questions={quizQuestions}
+            currentQuestionIndex={currentQuestionIndex}
+            onAnswer={handleAnswer}
+            trackQuestionView={(id) => trackEvent(EventType.QUESTION_VIEW, { questionId: id })}
+          />
+        );
+      case QuizState.LEAD_CAPTURE:
+        return <LeadCaptureScreen onSubmit={handleLeadSubmit} />;
+      case QuizState.RESULTS:
+        return <ResultScreen diagnosisLevel={diagnosisLevel} onOfferClick={() => trackEvent(EventType.OFFER_CLICK)} />;
+      case QuizState.AUTH:
+        return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
+      case QuizState.DASHBOARD:
+        // isAuthenticated check is handled by routing effect
+        return <DashboardScreen totalQuestions={quizQuestions.length}/>;
+      default:
+        return <WelcomeScreen onStart={() => {
+            trackEvent(EventType.QUIZ_START);
+            setView(QuizState.QUIZ);
+        }} trackVisit={() => trackEvent(EventType.VISIT)} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-brand-bg">
+      {renderContent()}
+    </div>
+  );
+};
+
+export default App;
