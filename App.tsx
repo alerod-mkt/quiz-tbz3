@@ -9,42 +9,35 @@ import DashboardScreen from './components/DashboardScreen';
 import AuthScreen from './components/AuthScreen';
 import * as api from './api';
 
+// Determines the correct initial view based on the URL path and auth status.
+const getInitialView = (): QuizState => {
+  if (window.location.pathname === '/dashboard') {
+    return sessionStorage.getItem('dashboard_authed') === 'true'
+      ? QuizState.DASHBOARD
+      : QuizState.AUTH;
+  }
+  return QuizState.WELCOME;
+};
+
+
 const App: React.FC = () => {
-  const [view, setView] = useState<QuizState>(QuizState.WELCOME);
+  const [view, setView] = useState<QuizState>(getInitialView);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosisLevel, setDiagnosisLevel] = useState<number>(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('dashboard_authed') === 'true');
   
-  // This unified routing effect handles both initial load and subsequent hash changes.
-  // This is the definitive fix for the race condition in the preview environment.
+  // This effect handles browser navigation events (like back/forward buttons)
+  // to keep the view in sync with the URL.
   useEffect(() => {
-    const handleRouting = () => {
-      const currentHash = window.location.hash;
-      if (currentHash === '#dashboard') {
-        const isAuthed = sessionStorage.getItem('dashboard_authed') === 'true';
-        setIsAuthenticated(isAuthed);
-        setView(isAuthed ? QuizState.DASHBOARD : QuizState.AUTH);
-      } else {
-        // Only reset to WELCOME if the view is a dashboard-related one.
-        // This prevents interrupting the quiz flow if the hash changes for other reasons.
-        if (view === QuizState.DASHBOARD || view === QuizState.AUTH) {
-            setView(QuizState.WELCOME);
-        }
-      }
+    const handlePopState = () => {
+      setView(getInitialView());
     };
 
-    // Check the route as soon as the component mounts.
-    handleRouting();
-
-    // Listen for future hash changes.
-    window.addEventListener('hashchange', handleRouting, false);
-
-    // Cleanup the listener.
+    window.addEventListener('popstate', handlePopState);
     return () => {
-      window.removeEventListener('hashchange', handleRouting, false);
+      window.removeEventListener('popstate', handlePopState);
     };
-  }, [view]); // Rerunning this on view change helps keep state consistent.
+  }, []); // Runs only once on component mount.
 
 
   const trackEvent = useCallback((eventType: EventType, payload?: any) => {
@@ -72,7 +65,6 @@ const App: React.FC = () => {
 
   const handleAuthSuccess = () => {
     sessionStorage.setItem('dashboard_authed', 'true');
-    setIsAuthenticated(true);
     setView(QuizState.DASHBOARD);
   };
   
@@ -109,9 +101,6 @@ const App: React.FC = () => {
       case QuizState.AUTH:
         return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
       case QuizState.DASHBOARD:
-        if (!isAuthenticated) {
-            return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
-        }
         return <DashboardScreen totalQuestions={quizQuestions.length}/>;
       default:
         return <WelcomeScreen onStart={() => {

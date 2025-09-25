@@ -39,7 +39,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => 
     };
     
     const handleBack = () => {
-        window.location.hash = '';
+        // Navigate to the root path and trigger a popstate event to update the view in App.tsx
+        window.history.pushState({}, '', '/');
+        window.dispatchEvent(new PopStateEvent('popstate'));
     };
 
     if (!metrics) {
