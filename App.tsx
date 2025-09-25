@@ -14,32 +14,37 @@ const App: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosisLevel, setDiagnosisLevel] = useState<number>(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('dashboard_authed') === 'true');
   
-  // This effect handles routing
+  // This unified routing effect handles both initial load and subsequent hash changes.
+  // This is the definitive fix for the race condition in the preview environment.
   useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === '#dashboard') {
-        if (sessionStorage.getItem('dashboard_authed') === 'true') {
-          setIsAuthenticated(true);
-          setView(QuizState.DASHBOARD);
-        } else {
-          setView(QuizState.AUTH);
-        }
+    const handleRouting = () => {
+      const currentHash = window.location.hash;
+      if (currentHash === '#dashboard') {
+        const isAuthed = sessionStorage.getItem('dashboard_authed') === 'true';
+        setIsAuthenticated(isAuthed);
+        setView(isAuthed ? QuizState.DASHBOARD : QuizState.AUTH);
       } else {
+        // Only reset to WELCOME if the view is a dashboard-related one.
+        // This prevents interrupting the quiz flow if the hash changes for other reasons.
         if (view === QuizState.DASHBOARD || view === QuizState.AUTH) {
             setView(QuizState.WELCOME);
         }
       }
     };
 
-    window.addEventListener('hashchange', handleHashChange, false);
-    handleHashChange(); // Check hash on initial load
+    // Check the route as soon as the component mounts.
+    handleRouting();
 
+    // Listen for future hash changes.
+    window.addEventListener('hashchange', handleRouting, false);
+
+    // Cleanup the listener.
     return () => {
-      window.removeEventListener('hashchange', handleHashChange, false);
+      window.removeEventListener('hashchange', handleRouting, false);
     };
-  }, [view]);
+  }, [view]); // Rerunning this on view change helps keep state consistent.
 
 
   const trackEvent = useCallback((eventType: EventType, payload?: any) => {
@@ -104,7 +109,9 @@ const App: React.FC = () => {
       case QuizState.AUTH:
         return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
       case QuizState.DASHBOARD:
-        // isAuthenticated check is handled by routing effect
+        if (!isAuthenticated) {
+            return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
+        }
         return <DashboardScreen totalQuestions={quizQuestions.length}/>;
       default:
         return <WelcomeScreen onStart={() => {
