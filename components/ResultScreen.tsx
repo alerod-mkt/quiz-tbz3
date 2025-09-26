@@ -116,7 +116,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
     ];
     
     useEffect(() => {
-        // Read lead data from URL search parameters when the component mounts
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name');
         const email = params.get('email');
@@ -142,7 +141,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
             
             window.location.href = `${baseUrl}&${checkoutParams.toString()}`;
         } else {
-            // Fallback if no lead data is present
+            // Fallback if no lead data is present in the URL
             window.location.href = baseUrl;
         }
     };

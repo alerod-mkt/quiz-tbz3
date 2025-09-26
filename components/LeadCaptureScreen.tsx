@@ -17,8 +17,12 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
       return;
     }
     setError('');
-    // Combine the static prefix with the user's input before submitting
-    const fullPhoneNumber = `55${phone.replace(/\D/g, '')}`;
+    
+    // Make phone number handling more robust
+    const digits = phone.replace(/\D/g, '');
+    // Ensure the number starts with 55, but don't add it if the user already typed it.
+    const fullPhoneNumber = digits.startsWith('55') ? digits : `55${digits}`;
+    
     onSubmit({ name, email, phone: fullPhoneNumber });
   };
 

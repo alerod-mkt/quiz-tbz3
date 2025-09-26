@@ -66,21 +66,22 @@ const App: React.FC = () => {
     params.append('name', leadData.name);
     params.append('email', leadData.email);
 
+    // Apply the Hotmart phone formatting logic immediately.
     const phoneDigits = leadData.phone.replace(/\D/g, '');
+    let phoneac = '';
+    let phonenumber = '';
     
-    if (phoneDigits.startsWith('55') && phoneDigits.length >= 12) {
-        const dddAndNumber = phoneDigits.slice(2);
-        const localNumber = phoneDigits.slice(4);
-        params.append('phoneac', dddAndNumber);
-        params.append('phonenumber', localNumber);
-    } else if (phoneDigits.length >= 10) {
-        const dddAndNumber = phoneDigits;
-        const localNumber = phoneDigits.slice(2);
-        params.append('phoneac', dddAndNumber);
-        params.append('phonenumber', localNumber);
-    } else {
-        params.append('phoneac', phoneDigits);
+    // Assumes phoneDigits includes '55' prefix
+    if (phoneDigits.length >= 12) { // 55 + DDD (2) + Number (8 or 9)
+        phoneac = phoneDigits.slice(2);      // e.g., 11912345678
+        phonenumber = phoneDigits.slice(4);  // e.g., 912345678
+    } else if (phoneDigits.length >= 10) { // Fallback for numbers without 55
+        phoneac = phoneDigits;
+        phonenumber = phoneDigits.slice(2);
     }
+    
+    params.append('phoneac', phoneac);
+    params.append('phonenumber', phonenumber);
     
     setTimeout(() => {
       setIsAnalyzing(false);
