@@ -11,10 +11,14 @@ import * as api from './api';
 
 // Determines the correct initial view based on the URL path and auth status.
 const getInitialView = (): QuizState => {
-  if (window.location.pathname === '/dashboard') {
+  const path = window.location.pathname;
+  if (path === '/dashboard') {
     return sessionStorage.getItem('dashboard_authed') === 'true'
       ? QuizState.DASHBOARD
       : QuizState.AUTH;
+  }
+  if (path === '/results') {
+      return QuizState.RESULTS;
   }
   return QuizState.WELCOME;
 };
@@ -60,9 +64,19 @@ const App: React.FC = () => {
     trackEvent(EventType.LEAD_SUBMIT);
     setIsAnalyzing(true);
     setDiagnosisLevel(Math.floor(Math.random() * 3));
+    
+    // Construct the URL with query parameters
+    const params = new URLSearchParams();
+    params.append('name', leadData.name);
+    params.append('email', leadData.email);
+    params.append('phone', leadData.phone);
+    
     setTimeout(() => {
       setIsAnalyzing(false);
-      setView(QuizState.RESULTS);
+      // Navigate to the results page with lead data in the URL
+      const newUrl = `/results?${params.toString()}`;
+      window.history.pushState({}, '', newUrl);
+      window.dispatchEvent(new PopStateEvent('popstate')); // Triggers the view change
       trackEvent(EventType.QUIZ_COMPLETE);
     }, 2500);
   }, [trackEvent]);

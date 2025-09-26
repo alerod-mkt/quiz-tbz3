@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,8 +95,15 @@ interface ResultScreenProps {
   onCheckoutStart: () => void;
 }
 
+interface LeadData {
+    name: string;
+    email: string;
+    phone: string;
+}
+
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutStart }) => {
+    const [leadData, setLeadData] = useState<LeadData | null>(null);
     const selectedDiagnosis = diagnoses[diagnosisLevel] || diagnoses[0];
     const bonuses = [
         "BÔNUS 1: WhatsApp da Reconquista - 50 mensagens que fazem ele sorrir",
@@ -106,11 +113,42 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
         "BÔNUS 5: Suporte por Email Exclusivo - Tire suas dúvidas diretamente comigo",
         "BÔNUS 6: Acesso VITALÍCIO - Para sempre, sem mensalidades",
     ];
+    
+    useEffect(() => {
+        // Read lead data from URL parameters when the component mounts
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name');
+        const email = params.get('email');
+        const phone = params.get('phone');
+        if (name && email && phone) {
+            setLeadData({ name, email, phone });
+        }
+    }, []);
 
     const handleCheckoutClick = () => {
         onCheckoutStart(); // First, track the event
-        // Then, redirect to the payment link
-        window.location.href = 'https://pay.hotmart.com/S101001652G?checkoutMode=10';
+
+        const baseUrl = 'https://pay.hotmart.com/S101001652G?checkoutMode=10';
+        
+        if (leadData) {
+            const checkoutParams = new URLSearchParams();
+            checkoutParams.append('name', leadData.name);
+            checkoutParams.append('email', leadData.email);
+
+            // Hotmart requires phone to be split into area code and number
+            const phoneDigits = leadData.phone.replace(/\D/g, ''); // Remove non-digits
+            if (phoneDigits.length >= 10) {
+                const areaCode = phoneDigits.substring(0, 2);
+                const number = phoneDigits.substring(2);
+                checkoutParams.append('phone_local_code', areaCode);
+                checkoutParams.append('phone_number', number);
+            }
+            
+            window.location.href = `${baseUrl}&${checkoutParams.toString()}`;
+        } else {
+            // Fallback if no lead data is present
+            window.location.href = baseUrl;
+        }
     };
 
   return (
