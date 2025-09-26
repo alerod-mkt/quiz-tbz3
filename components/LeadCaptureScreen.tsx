@@ -7,7 +7,7 @@ interface LeadCaptureScreenProps {
 const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('55');
+  const [phone, setPhone] = useState(''); // User types only the number part
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -17,7 +17,8 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
       return;
     }
     setError('');
-    onSubmit({ name, email, phone });
+    // Combine the static prefix with the user's input before submitting
+    onSubmit({ name, email, phone: `55${phone}` });
   };
 
   return (
@@ -30,7 +31,7 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
           Para receber sua análise personalizada e o plano de resgate, preencha os campos abaixo.
         </p>
         
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-5">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
           <input
             type="text"
             placeholder="Seu nome completo"
@@ -45,15 +46,25 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"
           />
-          <input
-            type="tel"
-            placeholder="5511999999999"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"
-          />
           
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          <div>
+            <label htmlFor="phone" className="block text-left text-sm text-brand-card-text-muted/80 mb-1">Celular</label>
+            <div className="flex items-center rounded-lg bg-brand-bg/20 focus-within:ring-2 focus-within:ring-brand-accent transition-all duration-200">
+                <span className="flex-shrink-0 inline-flex items-center pl-4 pr-3 py-3 text-lg text-brand-card-text-muted border-r border-brand-card-text/20">
+                    +55
+                </span>
+                <input
+                    id="phone"
+                    type="tel"
+                    placeholder="(11) 91234-5678"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-transparent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-r-lg py-3 px-4 text-lg focus:outline-none"
+                />
+            </div>
+          </div>
+          
+          {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
 
           <button
             type="submit"

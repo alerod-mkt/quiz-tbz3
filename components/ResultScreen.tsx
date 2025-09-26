@@ -135,10 +135,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
             checkoutParams.append('name', leadData.name);
             checkoutParams.append('email', leadData.email);
 
-            // Hotmart requires the full phone number (country code + area code + number) in the 'phoneac' parameter.
-            const phoneDigits = leadData.phoneac.replace(/\D/g, ''); // Remove non-digits
-            if (phoneDigits) {
-                checkoutParams.append('phoneac', phoneDigits);
+            // Hotmart requires specific phone parameters.
+            // phoneac = DDD + Number
+            // phonenumber = Number only
+            const phoneDigits = leadData.phoneac.replace(/\D/g, ''); // e.g., "5511987654321"
+            
+            // Assuming Brazilian numbers: 55 (DDI) + 11 (DDD) + 987654321 (Number)
+            if (phoneDigits.length >= 12) { // Minimum length for 55 + 2-digit DDD + 8-digit number
+                const dddAndNumber = phoneDigits.slice(2);   // e.g., "11987654321"
+                const localNumber = phoneDigits.slice(4);     // e.g., "987654321"
+                
+                checkoutParams.append('phoneac', dddAndNumber);
+                checkoutParams.append('phonenumber', localNumber);
             }
             
             window.location.href = `${baseUrl}&${checkoutParams.toString()}`;
