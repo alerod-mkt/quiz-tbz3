@@ -14,7 +14,7 @@ export enum EventType {
   QUESTION_COMPLETE = 'question_complete',
   LEAD_SUBMIT = 'lead_submit',
   QUIZ_COMPLETE = 'quiz_complete',
-  ADD_TO_CART = 'add_to_cart',
+  CHECKOUT_START = 'checkout_start',
 }
 
 export interface Question {
@@ -39,6 +39,6 @@ export interface QuizMetrics {
   leads: number;
   questionCompletions: { [key: number]: number };
   quizCompletions: number;
-  addToCarts: number;
+  checkoutStarts: number;
   visitors: Visitor[];
 }

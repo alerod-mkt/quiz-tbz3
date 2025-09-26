@@ -101,7 +101,7 @@ const App: React.FC = () => {
       case QuizState.LEAD_CAPTURE:
         return <LeadCaptureScreen onSubmit={handleLeadSubmit} />;
       case QuizState.RESULTS:
-        return <ResultScreen diagnosisLevel={diagnosisLevel} onAddToCart={() => trackEvent(EventType.ADD_TO_CART)} />;
+        return <ResultScreen diagnosisLevel={diagnosisLevel} onCheckoutStart={() => trackEvent(EventType.CHECKOUT_START)} />;
       case QuizState.AUTH:
         return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
       case QuizState.DASHBOARD:

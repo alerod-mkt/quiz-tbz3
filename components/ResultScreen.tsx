@@ -92,11 +92,11 @@ const diagnoses = [
 
 interface ResultScreenProps {
   diagnosisLevel: number;
-  onAddToCart: () => void;
+  onCheckoutStart: () => void;
 }
 
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onAddToCart }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutStart }) => {
     const selectedDiagnosis = diagnoses[diagnosisLevel] || diagnoses[0];
     const bonuses = [
         "BÔNUS 1: WhatsApp da Reconquista - 50 mensagens que fazem ele sorrir",
@@ -106,6 +106,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onAddToCart
         "BÔNUS 5: Suporte por Email Exclusivo - Tire suas dúvidas diretamente comigo",
         "BÔNUS 6: Acesso VITALÍCIO - Para sempre, sem mensalidades",
     ];
+
+    const handleCheckoutClick = () => {
+        onCheckoutStart(); // First, track the event
+        // Then, redirect to the payment link
+        window.location.href = 'https://pay.hotmart.com/S101001652G?checkoutMode=10';
+    };
 
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col items-center p-4 sm:p-6 lg:p-8">
@@ -204,7 +210,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onAddToCart
             <p className="text-brand-text/70 mt-2 max-w-xl">Se em 7 dias você não vir uma mudança radical nas brigas, devolvemos tudo. Mas pense: você prefere recuperar R$ 29,90 ou recuperar o futuro dos seus filhos?</p>
           </div>
 
-          <button onClick={onAddToCart} className="w-full bg-brand-accent text-brand-text font-bold text-2xl py-5 px-8 rounded-full shadow-lg shadow-brand-accent/30 hover:bg-brand-accent-dark hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <button onClick={handleCheckoutClick} className="w-full bg-brand-accent text-brand-text font-bold text-2xl py-5 px-8 rounded-full shadow-lg shadow-brand-accent/30 hover:bg-brand-accent-dark hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             SIM, VOU SALVAR MEUS FILHOS AGORA
           </button>
 
@@ -231,7 +237,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onAddToCart
                 </div>
             </div>
              <p className="text-center text-xl font-bold text-brand-card-text mt-10 mb-6">A escolha é sua. O futuro deles também.</p>
-             <button onClick={onAddToCart} className="w-full bg-brand-accent text-brand-text font-bold text-2xl py-5 px-8 rounded-full shadow-lg shadow-brand-accent/30 hover:bg-brand-accent-dark hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+             <button onClick={handleCheckoutClick} className="w-full bg-brand-accent text-brand-text font-bold text-2xl py-5 px-8 rounded-full shadow-lg shadow-brand-accent/30 hover:bg-brand-accent-dark hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 ESCOLHO SALVAR MINHA FAMÍLIA
              </button>
           </div>

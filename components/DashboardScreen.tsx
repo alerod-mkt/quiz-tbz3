@@ -50,12 +50,12 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => 
         );
     }
 
-    const { visits, quizStarts, leads, questionCompletions, quizCompletions, addToCarts, visitors } = metrics;
+    const { visits, quizStarts, leads, questionCompletions, quizCompletions, checkoutStarts, visitors } = metrics;
 
     const visitToStartRate = visits > 0 ? ((quizStarts / visits) * 100).toFixed(1) : '0.0';
     const startToLeadRate = quizStarts > 0 ? ((leads / quizStarts) * 100).toFixed(1) : '0.0';
     const leadToCompletionRate = leads > 0 ? ((quizCompletions / leads) * 100).toFixed(1) : '0.0';
-    const completionToCartRate = quizCompletions > 0 ? ((addToCarts / quizCompletions) * 100).toFixed(1) : '0.0';
+    const completionToCheckoutRate = quizCompletions > 0 ? ((checkoutStarts / quizCompletions) * 100).toFixed(1) : '0.0';
 
     const funnelSteps = [
         { name: 'Início do Quiz', value: quizStarts, prevValue: visits },
@@ -71,7 +71,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => 
         }),
         { name: 'Lead Gerado', value: leads, prevValue: questionCompletions[totalQuestions] || 0 },
         { name: 'Quiz Concluído', value: quizCompletions, prevValue: leads },
-        { name: 'Adição ao Carrinho', value: addToCarts, prevValue: quizCompletions }
+        { name: 'Iniciou Checkout', value: checkoutStarts, prevValue: quizCompletions }
     ];
 
     const recentVisitors = [...(visitors || [])].reverse().slice(0, 10);
@@ -99,7 +99,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => 
                     <MetricCard title="Inícios do Quiz" value={quizStarts} percentage={`${visitToStartRate}% dos visitantes`} />
                     <MetricCard title="Leads Gerados" value={leads} percentage={`${startToLeadRate}% de quem iniciou`} />
                     <MetricCard title="Quiz Concluídos" value={quizCompletions} percentage={`${leadToCompletionRate}% dos leads`}/>
-                    <MetricCard title="Adições ao Carrinho" value={addToCarts} percentage={`${completionToCartRate}% de quem concluiu`}/>
+                    <MetricCard title="Iniciou Checkout" value={checkoutStarts} percentage={`${completionToCheckoutRate}% de quem concluiu`}/>
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">

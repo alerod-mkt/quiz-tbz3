@@ -60,8 +60,8 @@ export const handleTrackEvent = async (eventType: EventType, payload?: any): Pro
     case EventType.QUIZ_COMPLETE:
       updatedMetrics.quizCompletions += 1;
       break;
-    case EventType.ADD_TO_CART:
-      updatedMetrics.addToCarts += 1;
+    case EventType.CHECKOUT_START:
+      updatedMetrics.checkoutStarts += 1;
       break;
     default:
       console.warn(`[Backend] Unknown event type: ${eventType}`);

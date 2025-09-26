@@ -8,7 +8,7 @@ const initialMetrics: QuizMetrics = {
   leads: 0,
   questionCompletions: {},
   quizCompletions: 0,
-  addToCarts: 0,
+  checkoutStarts: 0,
   visitors: [],
 };
 
