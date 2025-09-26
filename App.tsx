@@ -45,12 +45,15 @@ const App: React.FC = () => {
   }, []);
 
   const handleAnswer = useCallback(() => {
+    // Track completion of the CURRENT question before moving to the next
+    trackEvent(EventType.QUESTION_COMPLETE, { questionId: quizQuestions[currentQuestionIndex].id });
+
     if (currentQuestionIndex < quizQuestions.length - 1) {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1);
     } else {
       setView(QuizState.LEAD_CAPTURE);
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, trackEvent]);
 
   const handleLeadSubmit = useCallback((leadData: { name: string; email: string; phone: string }) => {
     console.log("Lead captured:", leadData);
@@ -60,6 +63,7 @@ const App: React.FC = () => {
     setTimeout(() => {
       setIsAnalyzing(false);
       setView(QuizState.RESULTS);
+      trackEvent(EventType.QUIZ_COMPLETE);
     }, 2500);
   }, [trackEvent]);
 
@@ -97,7 +101,7 @@ const App: React.FC = () => {
       case QuizState.LEAD_CAPTURE:
         return <LeadCaptureScreen onSubmit={handleLeadSubmit} />;
       case QuizState.RESULTS:
-        return <ResultScreen diagnosisLevel={diagnosisLevel} onOfferClick={() => trackEvent(EventType.OFFER_CLICK)} />;
+        return <ResultScreen diagnosisLevel={diagnosisLevel} onAddToCart={() => trackEvent(EventType.ADD_TO_CART)} />;
       case QuizState.AUTH:
         return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
       case QuizState.DASHBOARD:

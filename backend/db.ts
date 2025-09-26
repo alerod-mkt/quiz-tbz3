@@ -6,8 +6,10 @@ const initialMetrics: QuizMetrics = {
   visits: 0,
   quizStarts: 0,
   leads: 0,
-  offerClicks: 0,
-  questionViews: {},
+  questionCompletions: {},
+  quizCompletions: 0,
+  addToCarts: 0,
+  visitors: [],
 };
 
 // This simulates our "database" connection and operations.
@@ -18,7 +20,9 @@ export const db = {
     try {
       const storedMetrics = localStorage.getItem(METRICS_STORAGE_KEY);
       if (storedMetrics) {
-        return JSON.parse(storedMetrics);
+        // Ensure that the loaded metrics object has all the keys from the initialMetrics
+        const parsed = JSON.parse(storedMetrics);
+        return { ...initialMetrics, ...parsed };
       }
       localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(initialMetrics));
       return initialMetrics;
@@ -38,8 +42,9 @@ export const db = {
 
   resetMetrics: (): QuizMetrics => {
     try {
-      localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(initialMetrics));
-      return initialMetrics;
+      const newMetrics = { ...initialMetrics, questionCompletions: {}, visitors: [] };
+      localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(newMetrics));
+      return newMetrics;
     } catch (error) {
       console.error("Database reset error:", error);
       return initialMetrics;

@@ -10,9 +10,11 @@ export enum QuizState {
 export enum EventType {
   VISIT = 'visit',
   QUIZ_START = 'quiz_start',
-  QUESTION_VIEW = 'question_view',
+  QUESTION_VIEW = 'question_view', // Mantido para possível análise futura de visualização vs. conclusão
+  QUESTION_COMPLETE = 'question_complete',
   LEAD_SUBMIT = 'lead_submit',
-  OFFER_CLICK = 'offer_click',
+  QUIZ_COMPLETE = 'quiz_complete',
+  ADD_TO_CART = 'add_to_cart',
 }
 
 export interface Question {
@@ -22,10 +24,21 @@ export interface Question {
   options: string[];
 }
 
+export interface Visitor {
+    id: string;
+    ip: string;
+    country: string;
+    region: string;
+    city: string;
+    timestamp: string;
+}
+
 export interface QuizMetrics {
   visits: number;
   quizStarts: number;
   leads: number;
-  offerClicks: number;
-  questionViews: { [key: number]: number };
+  questionCompletions: { [key: number]: number };
+  quizCompletions: number;
+  addToCarts: number;
+  visitors: Visitor[];
 }
