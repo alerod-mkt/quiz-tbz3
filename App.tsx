@@ -72,10 +72,10 @@ const App: React.FC = () => {
     let phonenumber = '';
     
     // Assumes phoneDigits includes '55' prefix
-    if (phoneDigits.length >= 12) { // 55 + DDD (2) + Number (8 or 9)
-        phoneac = phoneDigits.slice(2);      // e.g., 11912345678
-        phonenumber = phoneDigits.slice(4);  // e.g., 912345678
-    } else if (phoneDigits.length >= 10) { // Fallback for numbers without 55
+    if (phoneDigits.length >= 12) { // 55 + DDD (2) + Number (9)
+        phoneac = phoneDigits.slice(2);      // e.g., 11987654321
+        phonenumber = phoneDigits.slice(4);  // e.g., 987654321
+    } else if (phoneDigits.length >= 10) { // Fallback for numbers without 55 or 8 digits
         phoneac = phoneDigits;
         phonenumber = phoneDigits.slice(2);
     }

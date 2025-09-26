@@ -69,7 +69,7 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
                 <input
                     id="phone"
                     type="tel"
-                    placeholder="(11) 91234-5678"
+                    placeholder="(11) 98765-4321"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full bg-transparent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-r-lg py-3 px-4 text-lg focus:outline-none"
