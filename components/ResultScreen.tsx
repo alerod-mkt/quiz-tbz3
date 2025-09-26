@@ -98,7 +98,7 @@ interface ResultScreenProps {
 interface LeadData {
     name: string;
     email: string;
-    phone: string;
+    phoneac: string;
 }
 
 
@@ -119,9 +119,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name');
         const email = params.get('email');
-        const phone = params.get('phone');
-        if (name && email && phone) {
-            setLeadData({ name, email, phone });
+        const phoneac = params.get('phoneac');
+        if (name && email && phoneac) {
+            setLeadData({ name, email, phoneac });
         }
     }, []);
 
@@ -136,7 +136,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
             checkoutParams.append('email', leadData.email);
 
             // Hotmart requires the full phone number (country code + area code + number) in the 'phoneac' parameter.
-            const phoneDigits = leadData.phone.replace(/\D/g, ''); // Remove non-digits
+            const phoneDigits = leadData.phoneac.replace(/\D/g, ''); // Remove non-digits
             if (phoneDigits) {
                 checkoutParams.append('phoneac', phoneDigits);
             }

@@ -69,7 +69,7 @@ const App: React.FC = () => {
     const params = new URLSearchParams();
     params.append('name', leadData.name);
     params.append('email', leadData.email);
-    params.append('phone', leadData.phone);
+    params.append('phoneac', leadData.phone);
     
     setTimeout(() => {
       setIsAnalyzing(false);
