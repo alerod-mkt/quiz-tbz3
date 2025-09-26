@@ -18,7 +18,8 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
     }
     setError('');
     // Combine the static prefix with the user's input before submitting
-    onSubmit({ name, email, phone: `55${phone}` });
+    const fullPhoneNumber = `55${phone.replace(/\D/g, '')}`;
+    onSubmit({ name, email, phone: fullPhoneNumber });
   };
 
   return (
@@ -32,20 +33,28 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
         </p>
         
         <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
-          <input
-            type="text"
-            placeholder="Seu nome completo"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"
-          />
-          <input
-            type="email"
-            placeholder="Seu melhor e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"
-          />
+          <div>
+            <label htmlFor="name" className="block text-left text-sm text-brand-card-text-muted/80 mb-1">Nome Completo</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Seu nome completo"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-left text-sm text-brand-card-text-muted/80 mb-1">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Seu melhor e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"
+            />
+          </div>
           
           <div>
             <label htmlFor="phone" className="block text-left text-sm text-brand-card-text-muted/80 mb-1">Celular</label>

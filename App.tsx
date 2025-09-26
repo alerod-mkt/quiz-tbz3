@@ -9,15 +9,15 @@ import DashboardScreen from './components/DashboardScreen';
 import AuthScreen from './components/AuthScreen';
 import * as api from './api';
 
-// Determines the correct initial view based on the URL path and auth status.
+// Determines the correct initial view based on the URL path.
 const getInitialView = (): QuizState => {
   const path = window.location.pathname;
-  if (path === '/dashboard') {
+  if (path.startsWith('/dashboard')) {
     return sessionStorage.getItem('dashboard_authed') === 'true'
       ? QuizState.DASHBOARD
       : QuizState.AUTH;
   }
-  if (path === '/results') {
+  if (path.startsWith('/results')) {
       return QuizState.RESULTS;
   }
   return QuizState.WELCOME;
@@ -30,8 +30,7 @@ const App: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosisLevel, setDiagnosisLevel] = useState<number>(0);
   
-  // This effect handles browser navigation events (like back/forward buttons)
-  // to keep the view in sync with the URL.
+  // This effect handles browser back/forward button clicks.
   useEffect(() => {
     const handlePopState = () => {
       setView(getInitialView());
@@ -41,7 +40,7 @@ const App: React.FC = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, []); // Runs only once on component mount.
+  }, []);
 
 
   const trackEvent = useCallback((eventType: EventType, payload?: any) => {
@@ -49,7 +48,6 @@ const App: React.FC = () => {
   }, []);
 
   const handleAnswer = useCallback(() => {
-    // Track completion of the CURRENT question before moving to the next
     trackEvent(EventType.QUESTION_COMPLETE, { questionId: quizQuestions[currentQuestionIndex].id });
 
     if (currentQuestionIndex < quizQuestions.length - 1) {
@@ -60,29 +58,41 @@ const App: React.FC = () => {
   }, [currentQuestionIndex, trackEvent]);
 
   const handleLeadSubmit = useCallback((leadData: { name: string; email: string; phone: string }) => {
-    console.log("Lead captured:", leadData);
     trackEvent(EventType.LEAD_SUBMIT);
     setIsAnalyzing(true);
     setDiagnosisLevel(Math.floor(Math.random() * 3));
     
-    // Construct the URL with query parameters
     const params = new URLSearchParams();
     params.append('name', leadData.name);
     params.append('email', leadData.email);
-    params.append('phoneac', leadData.phone);
+
+    const phoneDigits = leadData.phone.replace(/\D/g, '');
+    
+    if (phoneDigits.startsWith('55') && phoneDigits.length >= 12) {
+        const dddAndNumber = phoneDigits.slice(2);
+        const localNumber = phoneDigits.slice(4);
+        params.append('phoneac', dddAndNumber);
+        params.append('phonenumber', localNumber);
+    } else if (phoneDigits.length >= 10) {
+        const dddAndNumber = phoneDigits;
+        const localNumber = phoneDigits.slice(2);
+        params.append('phoneac', dddAndNumber);
+        params.append('phonenumber', localNumber);
+    } else {
+        params.append('phoneac', phoneDigits);
+    }
     
     setTimeout(() => {
       setIsAnalyzing(false);
-      // Navigate to the results page with lead data in the URL
-      const newUrl = `/results?${params.toString()}`;
-      window.history.pushState({}, '', newUrl);
-      window.dispatchEvent(new PopStateEvent('popstate')); // Triggers the view change
+      window.history.pushState(null, '', `/results?${params.toString()}`);
+      setView(QuizState.RESULTS);
       trackEvent(EventType.QUIZ_COMPLETE);
     }, 2500);
   }, [trackEvent]);
 
   const handleAuthSuccess = () => {
     sessionStorage.setItem('dashboard_authed', 'true');
+    window.history.pushState(null, '', '/dashboard');
     setView(QuizState.DASHBOARD);
   };
   
@@ -119,7 +129,13 @@ const App: React.FC = () => {
       case QuizState.AUTH:
         return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
       case QuizState.DASHBOARD:
-        return <DashboardScreen totalQuestions={quizQuestions.length}/>;
+        return <DashboardScreen 
+                 totalQuestions={quizQuestions.length} 
+                 onBack={() => {
+                   window.history.pushState(null, '', '/');
+                   setView(QuizState.WELCOME);
+                 }} 
+               />;
       default:
         return <WelcomeScreen onStart={() => {
             trackEvent(EventType.QUIZ_START);

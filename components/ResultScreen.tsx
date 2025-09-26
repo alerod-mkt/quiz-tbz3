@@ -99,6 +99,7 @@ interface LeadData {
     name: string;
     email: string;
     phoneac: string;
+    phonenumber: string;
 }
 
 
@@ -115,13 +116,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
     ];
     
     useEffect(() => {
-        // Read lead data from URL parameters when the component mounts
+        // Read lead data from URL search parameters when the component mounts
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name');
         const email = params.get('email');
         const phoneac = params.get('phoneac');
-        if (name && email && phoneac) {
-            setLeadData({ name, email, phoneac });
+        const phonenumber = params.get('phonenumber');
+        
+        if (name && email && phoneac && phonenumber) {
+            setLeadData({ name, email, phoneac, phonenumber });
         }
     }, []);
 
@@ -134,20 +137,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
             const checkoutParams = new URLSearchParams();
             checkoutParams.append('name', leadData.name);
             checkoutParams.append('email', leadData.email);
-
-            // Hotmart requires specific phone parameters.
-            // phoneac = DDD + Number
-            // phonenumber = Number only
-            const phoneDigits = leadData.phoneac.replace(/\D/g, ''); // e.g., "5511987654321"
-            
-            // Assuming Brazilian numbers: 55 (DDI) + 11 (DDD) + 987654321 (Number)
-            if (phoneDigits.length >= 12) { // Minimum length for 55 + 2-digit DDD + 8-digit number
-                const dddAndNumber = phoneDigits.slice(2);   // e.g., "11987654321"
-                const localNumber = phoneDigits.slice(4);     // e.g., "987654321"
-                
-                checkoutParams.append('phoneac', dddAndNumber);
-                checkoutParams.append('phonenumber', localNumber);
-            }
+            checkoutParams.append('phoneac', leadData.phoneac);
+            checkoutParams.append('phonenumber', leadData.phonenumber);
             
             window.location.href = `${baseUrl}&${checkoutParams.toString()}`;
         } else {

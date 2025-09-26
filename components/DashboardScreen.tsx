@@ -4,6 +4,7 @@ import * as api from '../api';
 
 interface DashboardScreenProps {
   totalQuestions: number;
+  onBack: () => void;
 }
 
 const BackIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -20,7 +21,7 @@ const MetricCard: React.FC<{ title: string; value: string | number; percentage?:
   </div>
 );
 
-const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => {
+const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions, onBack }) => {
     const [metrics, setMetrics] = useState<QuizMetrics | null>(null);
 
     useEffect(() => {
@@ -35,11 +36,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => 
         await api.resetMetrics();
         const data = await api.getMetrics();
         setMetrics(data);
-    };
-    
-    const handleBack = () => {
-        window.history.pushState({}, '', '/');
-        window.dispatchEvent(new PopStateEvent('popstate'));
     };
 
     if (!metrics) {
@@ -81,7 +77,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ totalQuestions }) => 
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center space-x-4">
-                        <button onClick={handleBack} className="text-brand-text/70 hover:text-brand-accent transition-colors">
+                        <button onClick={onBack} className="text-brand-text/70 hover:text-brand-accent transition-colors">
                             <BackIcon className="w-10 h-10"/>
                         </button>
                         <h1 className="text-4xl font-bold text-brand-text">Dashboard de Métricas</h1>
