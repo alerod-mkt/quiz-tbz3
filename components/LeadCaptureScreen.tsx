@@ -7,7 +7,7 @@ interface LeadCaptureScreenProps {
 const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('55');
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,7 +47,7 @@ const LeadCaptureScreen: React.FC<LeadCaptureScreenProps> = ({ onSubmit }) => {
           />
           <input
             type="tel"
-            placeholder="Seu telefone (com DDD)"
+            placeholder="5511999999999"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full bg-brand-bg/20 border-2 border-transparent focus:border-brand-accent focus:ring-brand-accent text-brand-card-text placeholder-brand-card-text-muted/70 rounded-lg py-3 px-4 text-lg transition-colors"

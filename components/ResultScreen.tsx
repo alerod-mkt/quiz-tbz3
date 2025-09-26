@@ -135,13 +135,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ diagnosisLevel, onCheckoutS
             checkoutParams.append('name', leadData.name);
             checkoutParams.append('email', leadData.email);
 
-            // Hotmart requires phone to be split into area code and number
+            // Hotmart requires the full phone number (country code + area code + number) in the 'phoneac' parameter.
             const phoneDigits = leadData.phone.replace(/\D/g, ''); // Remove non-digits
-            if (phoneDigits.length >= 10) {
-                const areaCode = phoneDigits.substring(0, 2);
-                const number = phoneDigits.substring(2);
-                checkoutParams.append('phone_local_code', areaCode);
-                checkoutParams.append('phone_number', number);
+            if (phoneDigits) {
+                checkoutParams.append('phoneac', phoneDigits);
             }
             
             window.location.href = `${baseUrl}&${checkoutParams.toString()}`;
